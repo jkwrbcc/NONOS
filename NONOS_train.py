@@ -25,6 +25,8 @@ def main():
                         help='mode of the curve fitting method')
     parser.add_argument('--specpara-results', default='results', type=str,
                         help='input data directory for precalculated SpecParam results')
+    parser.add_argument('--epochs', default=50, type=int,
+                        help='the number of epochs')
     args = parser.parse_args()
     #########################################################
     args.world_size = args.gpus              #
@@ -50,7 +52,7 @@ def train(gpu, args):
     fs = 500
     t_len = 4
     data_len = fs*t_len
-
+    
     fpath = '/home/bcc/Documents/Data/NONOS_v4/'
     exp_num = '1_1'
 
@@ -62,7 +64,7 @@ def train(gpu, args):
     data_nosc = torch.tensor(data_nosc).transpose(1,2)
     data_osc = torch.tensor(data_osc).transpose(1,2)
 
-    amp_nosc = torch.abs(torch.fft.rfft(amp_nosc, dim=-1))
+    amp_nosc = torch.abs(torch.fft.rfft(data_nosc, dim=-1))
     amp_osc = torch.abs(torch.fft.rfft(data_osc, dim=-1))
     amp = torch.concatenate((amp_osc, amp_nosc), dim=1) # B x 2 x L
     amp = amp.transpose(1, 2)  # B x L x 2

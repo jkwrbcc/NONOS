@@ -44,7 +44,7 @@ def main():
     # data name
     fpath = '/data/'
     exp_num = '4_1_1'
-    save_path = fpath + 'Experiment' + exp_num + '/'
+    save_path = fpath + '/'
 
     fname_nosc = 'nosc_'+str(fs)+'Hz'+str(t_len)+'sec_' + 'Experiment' + exp_num + '.npy'
     fname_osc = 'osc_'+str(fs)+'Hz'+str(t_len)+'sec_' + 'Experiment' + exp_num + '.npy'
