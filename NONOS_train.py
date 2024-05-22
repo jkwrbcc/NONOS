@@ -51,10 +51,7 @@ def train(gpu, args):
     # Data loading
     fs = 500
     t_len = 4
-    data_len = fs*t_len
-    
-    fpath = '/home/bcc/Documents/Data/NONOS_v4/'
-    exp_num = '1_1'
+    data_len = fs*t_lens
 
     data_nosc = np.load(args.fname_nosc)
     data_osc = np.load(args.fname_osc)
@@ -100,7 +97,7 @@ def train(gpu, args):
 
     ############################################################
     # Model saved location
-    default_path = 'training/'
+    default_path = '/training/'
     current_datetime = datetime.now()
     save_name = current_datetime.strftime("%Y%m%d%H%M%S")
     model_checkpoint_name = default_path + save_name + "_" + args.mode + ".checkpoint"
