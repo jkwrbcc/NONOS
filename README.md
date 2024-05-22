@@ -49,9 +49,3 @@ Our model achieves the following performance on :
 ![image](https://github.com/jkwrbcc/NONOS/assets/170528215/32012f6c-864a-476e-b2ae-d4bbc0d3a995)
 
 >📋  Include a table of results from your paper, and link back to the leaderboard for clarity and context. If your main result is a figure, include that figure and link to the command or notebook to reproduce it. 
-
-
-## Acknowledgements
-The implementation of NONOS relies on resources from the following repositories, we thank the original authors for open-sourcing their work.
-- https://neurodsp-tools.github.io/neurodsp/
-- https://github.com/fooof-tools/fooof
