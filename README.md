@@ -49,5 +49,3 @@ Our model achieves the following performance on :
 The implementation of CoST relies on resources from the following repositories, we thank the original authors for open-sourcing their work.
 - https://neurodsp-tools.github.io/neurodsp/
 - https://github.com/fooof-tools/fooof
-
->📋  Pick a licence and describe how to contribute to your code repository. 
