@@ -15,6 +15,8 @@ from utils import *
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--save_path', default='/home/', type=str,
+                        help='default path to save model')
     parser.add_argument('--fname_osc', default='osc', type=str,
                         help='input data directory for oscillation')
     parser.add_argument('--fname_nosc', default='nosc', type=str,
@@ -97,7 +99,7 @@ def train(gpu, args):
 
     ############################################################
     # Model saved location
-    default_path = '/training/'
+    default_path = args.save_path
     current_datetime = datetime.now()
     save_name = current_datetime.strftime("%Y%m%d%H%M%S")
     model_checkpoint_name = default_path + save_name + "_" + args.mode + ".checkpoint"

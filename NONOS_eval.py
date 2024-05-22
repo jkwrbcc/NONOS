@@ -23,6 +23,8 @@ def main():
                         help='input data directory for non-oscillation')
     parser.add_argument('-g', '--gpus', default=1, type=int,
                         help='number of gpus to use')
+    parser.add_argument('--mode', default='simple', type=str,
+                        help='model version')
     args = parser.parse_args()
     #########################################################
     args.world_size = args.gpus              #
@@ -117,9 +119,6 @@ def train(gpu, args):
         eps=1e-08,
     )
     
-    scheduler = optim.lr_scheduler.LambdaLR(optimizer = Optimizer,
-                                            lr_lambda = lambda epoch: 0.95 ** epoch)
-    
     ############################################################
 
     ###############################################################
@@ -143,121 +142,58 @@ def train(gpu, args):
             dataset = torch.tensor([]).cuda(gpu)
             dataset_x = torch.tensor([]).cuda(gpu)
 
-            if gpu==0:
-                with tqdm(loader, unit="batch") as tepoch:
-                    for batch in tepoch:
-                        tepoch.set_description(f"Epoch {epoch+1}/{args.epochs}")
+            for batch in loader:
+                R = batch[0].type(torch.float32) # amplitude (radius) in frequency domain
+                R = R[:, :, 0] + R[:, :, 1]
+                R = torch.log10(R+1e-6)
+                R = R.type(torch.float32)
+                R = R.unsqueeze(1) # B x 1 x L//2+1
+                R = R[:, :, 1::]
 
-                        R = batch[0].type(torch.float32) # amplitude (radius) in frequency domain
-                        R = R[:, :, 0] + R[:, :, 1]
-                        R = torch.log10(R+1e-6)
-                        R = R.type(torch.float32)
-                        R = R.unsqueeze(1) # B x 1 x L//2+1
-                        R = R[:, :, 1::]
+                R = R.cuda(non_blocking=True)
 
-                        R = R.cuda(non_blocking=True)
+                x = batch[1].type(torch.float32).cuda(non_blocking=True)
+                x = x[:, 0, :] + x[:, 1, :] # B x 1 x L
+                x = symmetric_zero_pad(x, target_length)
 
-                        x = batch[1].type(torch.float32).cuda(non_blocking=True)
-                        x = x[:, 0, :] + x[:, 1, :] # B x 1 x L
-                        x = symmetric_zero_pad(x, target_length)
+                ######### Forward #########
+                fake_x_ap = unpad(model(x), data_len)
+                R_ap = abs(torch.fft.rfft(fake_x_ap, dim=-1))
+                R_ap = R_ap[:, :, 1::]
+                R_ap = torch.log10(R_ap+1e-6)
 
-                        ######### Forward #########
-                        fake_x_ap = unpad(model(x), data_len)
-                        R_ap = abs(torch.fft.rfft(fake_x_ap, dim=-1))
-                        R_ap = R_ap[:, :, 1::]
-                        R_ap = torch.log10(R_ap+1e-6)
-
-                        result = torch.cat((result, fake_x_ap), dim=0)
-                        x = batch[1].type(torch.float32)
-                        temp_x = torch.cat((x[:, 0, :], x[:, 1, :]), dim=1).cuda(non_blocking=True)
-                        dataset_x = torch.cat((dataset_x, temp_x), dim=0)     
-                
-            else:
-                for batch in loader:
-                    R = batch[0].type(torch.float32) # amplitude (radius) in frequency domain
-                    R = R[:, :, 0] + R[:, :, 1]
-                    R = torch.log10(R+1e-6)
-                    R = R.type(torch.float32)
-                    R = R.unsqueeze(1) # B x 1 x L//2+1
-                    R = R[:, :, 1::]
-
-                    R = R.cuda(non_blocking=True)
-
-                    x = batch[1].type(torch.float32).cuda(non_blocking=True)
-                    x = x[:, 0, :] + x[:, 1, :] # B x 1 x L
-                    x = symmetric_zero_pad(x, target_length)
-
-                    ######### Forward #########
-                    fake_x_ap = unpad(model(x), data_len)
-                    R_ap = abs(torch.fft.rfft(fake_x_ap, dim=-1))
-                    R_ap = R_ap[:, :, 1::]
-                    R_ap = torch.log10(R_ap+1e-6)
-
-                    result = torch.cat((result, fake_x_ap), dim=0)
-                    x = batch[1].type(torch.float32)
-                    temp_x = torch.cat((x[:, 0, :], x[:, 1, :]), dim=1).cuda(non_blocking=True)
-                    dataset_x = torch.cat((dataset_x, temp_x), dim=0)     
-
-         
-    if args.mode == 'SpecParam':
-        for epoch in range(args.epochs):
-            if gpu==0:
-                with tqdm(loader, unit="batch") as tepoch:
-                    for batch in tepoch:
-                        tepoch.set_description(f"Epoch {epoch+1}/{args.epochs}")
-
-                        R = batch[0].type(torch.float32) # amplitude (radius) in frequency domain
-                        batch_params = R[:, -1, :] # B x 2
-                        R = R[:, :-1, 0] + R[:, :-1, 1]
-                        R = torch.log10(R+1e-6)
-                        R = R.type(torch.float32)
-                        R = R.unsqueeze(1) # B x 1 x L//2+1
-                        R = R[:, :, 1::]
-
-                        R = R.cuda(non_blocking=True) 
-
-                        x = batch[1].type(torch.float32).cuda(non_blocking=True)
-                        x = x[:, 0, :] + x[:, 1, :] # B x 1 x L
-                        x = symmetric_zero_pad(x, target_length)  
-
-                        ######### Forward #########
-                        fake_x_ap = unpad(model(x), data_len)
-                        R_ap = abs(torch.fft.rfft(fake_x_ap, dim=-1))
-                        R_ap = R_ap[:, :, 1::]
-                        R_ap = torch.log10(R_ap+1e-6)
-
-                        result = torch.cat((result, fake_x_ap), dim=0)
-                        x = batch[1].type(torch.float32)
-                        temp_x = torch.cat((x[:, 0, :], x[:, 1, :]), dim=1).cuda(non_blocking=True)
-                        dataset_x = torch.cat((dataset_x, temp_x), dim=0)     
-                
-            else:
-                for batch in loader:
-                    R = batch[0].type(torch.float32) # amplitude (radius) in frequency domain
-                    batch_params = R[:, -1, :] # B x 2
-                    R = R[:, :-1, 0] + R[:, :-1, 1]
-                    R = torch.log10(R+1e-6)
-                    R = R.type(torch.float32)
-                    R = R.unsqueeze(1) # B x 1 x L//2+1
-                    R = R[:, :, 1::]
-                            
-                    R = R.cuda(non_blocking=True) 
-
-                    x = batch[1].type(torch.float32).cuda(non_blocking=True)
-                    x = x[:, 0, :] + x[:, 1, :] # B x 1 x L
-                    x = symmetric_zero_pad(x, target_length)  
-
-                    ######### Forward #########
-                    fake_x_ap = unpad(model(x), data_len)
-                    R_ap = abs(torch.fft.rfft(fake_x_ap, dim=-1))
-                    R_ap = R_ap[:, :, 1::]
-                    R_ap = torch.log10(R_ap+1e-6)
-
-                    result = torch.cat((result, fake_x_ap), dim=0)
-                    x = batch[1].type(torch.float32)
-                    temp_x = torch.cat((x[:, 0, :], x[:, 1, :]), dim=1).cuda(non_blocking=True)
-                    dataset_x = torch.cat((dataset_x, temp_x), dim=0)   
+                result = torch.cat((result, fake_x_ap), dim=0)
+                x = batch[1].type(torch.float32)
+                temp_x = torch.cat((x[:, 0, :], x[:, 1, :]), dim=1).cuda(non_blocking=True)
+                dataset_x = torch.cat((dataset_x, temp_x), dim=0)     
             
+    if args.mode == 'SpecParam':
+        for batch in loader:
+            R = batch[0].type(torch.float32) # amplitude (radius) in frequency domain
+            batch_params = R[:, -1, :] # B x 2
+            R = R[:, :-1, 0] + R[:, :-1, 1]
+            R = torch.log10(R+1e-6)
+            R = R.type(torch.float32)
+            R = R.unsqueeze(1) # B x 1 x L//2+1
+            R = R[:, :, 1::]
+
+            R = R.cuda(non_blocking=True) 
+
+            x = batch[1].type(torch.float32).cuda(non_blocking=True)
+            x = x[:, 0, :] + x[:, 1, :] # B x 1 x L
+            x = symmetric_zero_pad(x, target_length)  
+
+            ######### Forward #########
+            fake_x_ap = unpad(model(x), data_len)
+            R_ap = abs(torch.fft.rfft(fake_x_ap, dim=-1))
+            R_ap = R_ap[:, :, 1::]
+            R_ap = torch.log10(R_ap+1e-6)
+
+            result = torch.cat((result, fake_x_ap), dim=0)
+            x = batch[1].type(torch.float32)
+            temp_x = torch.cat((x[:, 0, :], x[:, 1, :]), dim=1).cuda(non_blocking=True)
+            dataset_x = torch.cat((dataset_x, temp_x), dim=0)     
+    
         print('Elapsed time: ', datetime.now()-start)
 
     if gpu==0:
@@ -287,10 +223,10 @@ def train(gpu, args):
             err_f[data_idx] = np.mean(np.abs(fake_R_ap - R_ap))
             R2_f[data_idx] = calculate_R_squared(R_ap, fake_R_ap)
             
-        print('Time error: ', np.mean(err_t))
-        print('Time R2: ', np.mean(R2_t))
-        print('Freq error: ', np.mean(err_f))
-        print('Freq R2: ', np.mean(R2_f))
+        print('Time error: ', np.round(np.mean(err_t), 3))
+        print('Time R2: ', np.round(np.mean(R2_t), 3))
+        print('Freq error: ', np.round(np.mean(err_f), 3))
+        print('Freq R2: ', np.round(np.mean(R2_f), 3))
 
     ###############################################################
  
