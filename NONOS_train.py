@@ -51,7 +51,7 @@ def train(gpu, args):
     # Data loading
     fs = 500
     t_len = 4
-    data_len = fs*t_lens
+    data_len = fs*t_len
 
     data_nosc = np.load(args.fname_nosc)
     data_osc = np.load(args.fname_osc)
