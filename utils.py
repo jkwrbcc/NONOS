@@ -72,3 +72,10 @@ def ap_fit_torch(freqs, offset, exponent):
 def ap_fit(freqs, offset, exponent):
     fits = offset - np.log10(freqs**(exponent))
     return fits
+
+def calculate_R_squared(y_true, y_pred):
+    y_true_mean = np.mean(y_true)
+    SS_tot = np.sum((y_true - y_true_mean) ** 2)
+    SS_res = np.sum((y_true - y_pred) ** 2)
+    return 1 - SS_res / SS_tot
+
