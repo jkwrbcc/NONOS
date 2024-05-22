@@ -27,8 +27,12 @@ python generate_sim.py --num_exp 4_1
 To train the model(s) in the paper, run this command:
 
 ```train
-python NONOS_train.py --input-data <path_to_data> --gpus 4 --epochs 200 --mode <simple or SpecParam> --params <precalculated_SpecParam_results>
+python NONOS_train.py --input-data <path_to_data> --gpus 4 --epochs 200 --mode <simple or SpecParam> --specpara-result <path_to_result>
 ```
+
+We provide two versions of models: NONOS-simple and NONOS-SpecParam.
+For NONOS-SpecParam, a pre-calculated spectral parameterization result is required for smooth computation.
+
 
 ## Evaluation
 
