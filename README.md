@@ -23,6 +23,7 @@ python generate_sim.py --exp_num 4_1_1
 ```
 
 The experimental number (exp_num) corresponds to Section number in our paper.
+The spectral parameterization process with SpecParam takes considerable time.
 
 ## Training
 
