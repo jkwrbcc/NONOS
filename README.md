@@ -30,7 +30,7 @@ python generate_sim.py --exp_num 4_1_1
 To train the model(s) in the paper, run this command:
 
 ```train
-python NONOS_train.py --fname_osc <path_to_osc> --fname_osc <path_to_nosc> --gpus 4--mode <simple or SpecParam> --specpara-result <path_to_result> --epochs 200
+python NONOS_train.py --fname_osc <path_to_osc> --fname_osc <path_to_nosc> --gpus 4 --mode <simple or SpecParam> --specpara-result <path_to_result> --epochs 200
 ```
 
 - We provide two versions of models: NONOS-simple and NONOS-SpecParam.
@@ -42,7 +42,7 @@ python NONOS_train.py --fname_osc <path_to_osc> --fname_osc <path_to_nosc> --gpu
 To evaluate my model on ImageNet, run:
 
 ```eval
-python NONOS_eval.py --model-file mymodel.checkpoint --input-data <path_to_data>
+python NONOS_eval.py --model-file mymodel.checkpoint --input-data <path_to_data> --gpus 4
 ```
 
 ## Results
