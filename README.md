@@ -30,8 +30,6 @@ To train the model(s) in the paper, run this command:
 python train.py --input-data <path_to_data> --gpus 4 --epochs 200
 ```
 
->📋  Describe how to train the models, with example commands on how to train the models in your paper, including the full training procedure and appropriate hyperparameters.
-
 ## Evaluation
 
 To evaluate my model on ImageNet, run:
@@ -39,8 +37,6 @@ To evaluate my model on ImageNet, run:
 ```eval
 python eval.py --model-file mymodel.checkpoint --input-data <path_to_data>
 ```
-
->📋  Describe how to evaluate the trained models on benchmarks reported in the paper, give commands that produce the results (section below).
 
 ## Results
 
