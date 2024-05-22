@@ -40,17 +40,11 @@ def main():
     amp_range = [0.5, 2]
 
     num_ch = 1
-    data = np.zeros((num_data, len(times), num_ch), dtype=np.float32)
-    data_ap = np.zeros((num_data, len(times), num_ch), dtype=np.float32)
-    data_p = np.zeros((num_data, len(times), num_ch), dtype=np.float32)
 
     # data name
     fpath = '/data/'
     exp_num = '4_1_1'
     save_path = fpath + 'Experiment' + exp_num + '/'
-
-    if not os.path.exists(save_path):
-        os.makedirs(save_path)
 
     fname_nosc = 'nosc_'+str(fs)+'Hz'+str(t_len)+'sec_' + 'Experiment' + exp_num + '.npy'
     fname_osc = 'osc_'+str(fs)+'Hz'+str(t_len)+'sec_' + 'Experiment' + exp_num + '.npy'
@@ -92,25 +86,25 @@ def main():
         data_nosc[i, :, :] = np.reshape(ap, (len(ap), 1))
         data_osc[i, :, :] = np.reshape(p, (len(p), 1))
 
-        data = data_nosc + data_osc
-    
-        t = time.time()
+    data = data_nosc + data_osc
 
-        fg = SpectralGroupModel(peak_width_limits=[1, 8], min_peak_height=0.1, max_n_peaks=6)
-        data = data.squeeze(2) # (num_data, num_time)
-        R = torch.abs(torch.fft.rfft(torch.tensor(data), dim=-1))
-        R = R + 1e-6 # (num_data, num_freqs)
-        freqs = torch.fft.rfftfreq(data.shape[-1], 1/fs)
+    t = time.time()
 
-        fg.fit(freqs.numpy(), R.numpy(), [1, fs//2]) 
-        params = fg.get_params('aperiodic_params')
-        print('Elappsed time to obtain specparam results: {}'.format(time.time() - t))
+    fg = SpectralGroupModel(peak_width_limits=[1, 8], min_peak_height=0.1, max_n_peaks=6)
+    data = data.squeeze(2) # (num_data, num_time)
+    R = torch.abs(torch.fft.rfft(torch.tensor(data), dim=-1))
+    R = R + 1e-6 # (num_data, num_freqs)
+    freqs = torch.fft.rfftfreq(data.shape[-1], 1/fs)
 
-        fname_nosc_params = 'nosc_params'+str(fs)+'Hz'+str(t_len)+'sec_' + 'Experiment' + exp_num + '.npy'
+    fg.fit(freqs.numpy(), R.numpy(), [1, fs//2]) 
+    params = fg.get_params('aperiodic_params')
+    print('Elappsed time to obtain specparam results: {}'.format(time.time() - t))
 
-        np.save(save_path + fname_nosc, data_nosc)
-        np.save(save_path + fname_osc, data_osc)
-        np.save(save_path + fname_nosc_params, params)
+    fname_nosc_params = 'nosc_params'+str(fs)+'Hz'+str(t_len)+'sec_' + 'Experiment' + exp_num + '.npy'
+
+    np.save(save_path + fname_nosc, data_nosc)
+    np.save(save_path + fname_osc, data_osc)
+    np.save(save_path + fname_nosc_params, params)
 
 
 if __name__ == '__main__':
