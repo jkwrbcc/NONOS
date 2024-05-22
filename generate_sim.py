@@ -13,6 +13,7 @@ from neurodsp.utils import create_times
 from neurodsp.plts.spectral import plot_power_spectra
 from neurodsp.plts.time_series import plot_time_series
 
+import os
 import numpy as np
 import torch
 import specparam
@@ -47,11 +48,15 @@ def main():
     fpath = '/data/'
     exp_num = '4_1_1'
     save_path = fpath + 'Experiment' + exp_num + '/'
+
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+
     fname_nosc = 'nosc_'+str(fs)+'Hz'+str(t_len)+'sec_' + 'Experiment' + exp_num + '.npy'
     fname_osc = 'osc_'+str(fs)+'Hz'+str(t_len)+'sec_' + 'Experiment' + exp_num + '.npy'
     
-    data_ap = np.zeros((num_data, len(times), num_ch), dtype=np.float32)
-    data_p = np.zeros((num_data, len(times), num_ch), dtype=np.float32)
+    data_nosc = np.zeros((num_data, len(times), num_ch), dtype=np.float32)
+    data_osc = np.zeros((num_data, len(times), num_ch), dtype=np.float32)
 
     opt = 0 # 0: sinusoidal ; 1: non-sinusoidal
     rdsym = 0.2
@@ -84,10 +89,10 @@ def main():
 
         p = amp * p
         
-        data_ap[i, :, :] = np.reshape(ap, (len(ap), 1))
-        data_p[i, :, :] = np.reshape(p, (len(p), 1))
+        data_nosc[i, :, :] = np.reshape(ap, (len(ap), 1))
+        data_osc[i, :, :] = np.reshape(p, (len(p), 1))
 
-        data = data_ap + data_p
+        data = data_nosc + data_osc
     
         t = time.time()
 
@@ -103,8 +108,8 @@ def main():
 
         fname_nosc_params = 'nosc_params'+str(fs)+'Hz'+str(t_len)+'sec_' + 'Experiment' + exp_num + '.npy'
 
-        np.save(save_path + fname_nosc, data_ap)
-        np.save(save_path + fname_osc, data_p)
+        np.save(save_path + fname_nosc, data_nosc)
+        np.save(save_path + fname_osc, data_osc)
         np.save(save_path + fname_nosc_params, params)
 
 
