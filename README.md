@@ -1,5 +1,3 @@
->📋  A template README.md for code accompanying a Machine Learning paper
-
 # NONOS: Neural Oscillation and Non-Oscillation Separator for Securing Temporal Resolution
 
 This repository is the official implementation of [NONOS: Neural Oscillation and Non-Oscillation Separator for Securing Temporal Resolution]. 
