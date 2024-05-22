@@ -21,7 +21,7 @@ pip install -r requirements.txt
 To generate the simulation data in the paper, run this command:
 
 ```train
-python generate_sim.py --num_exp
+python generate_sim.py --num_exp 4_1
 ```
 
 ## Training
