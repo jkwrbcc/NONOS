@@ -14,6 +14,9 @@ pip install -r requirements.txt
 
 >📋  Describe how to set up the environment, e.g. pip/conda/docker commands, download datasets, etc...
 
+## Release note
+The convenience update coming soon!
+
 ## Generate simulation data
 
 To generate the simulation data in the paper, run this command:
