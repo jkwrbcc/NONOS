@@ -27,7 +27,7 @@ python generate_sim.py --num_exp 4_1
 To train the model(s) in the paper, run this command:
 
 ```train
-python train.py --input-data <path_to_data> --gpus 4 --epochs 200
+python NONOS_train.py --input-data <path_to_data> --gpus 4 --epochs 200 --mode <simple or SpecParam> --params <precalculated_SpecParam_results>
 ```
 
 ## Evaluation
@@ -35,7 +35,7 @@ python train.py --input-data <path_to_data> --gpus 4 --epochs 200
 To evaluate my model on ImageNet, run:
 
 ```eval
-python eval.py --model-file mymodel.checkpoint --input-data <path_to_data>
+python NONOS_eval.py --model-file mymodel.checkpoint --input-data <path_to_data>
 ```
 
 ## Results
