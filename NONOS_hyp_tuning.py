@@ -33,7 +33,7 @@ def main():
     
     config = {
         "inner_dim": tune.choice([2**i for i in range(5, 9)]),
-        "kernel_size": tune.choice([3, 5, 7, 9, 11]),
+        "kernel_size": tune.choice([3, 5, 7, 9, 11, 13]),
         "depth": tune.choice([3, 4, 5]),
         "num_layers": tune.choice([3, 4, 5]),
         "beta": tune.choice([0.5, 0.1, 0.05, 0.01, 0.005]), #tune.choice([1, 5, 10, 20]),
