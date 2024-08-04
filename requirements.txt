@@ -9,3 +9,4 @@ neurodsp==2.2.1
 pyparsing==3.1.2
 numpy==1.23.0
 specparam==2.0.0rc2
+ray[tune]==2.34.0
